@@ -1,0 +1,73 @@
+## [CH02_02] A Brief History of AI
+
+### History
+- 1980년대 현재 사용하는 DL의 기반이 이루어짐
+- 1998, LeNet-5, CNN
+- 2006, DBN(Deep Belief Network)
+- 2009, ImageNet(dataset)
+  - 15M의 이미지 수
+  - Vision 인식
+- 2011, Common Crawl
+- 2012, 고양이넷(in Youtube)
+  - 유투브에 있는 내용을 학습
+  - 고양이, 사람을 분리
+  - 비지도 학습
+- 2012, AlexNet
+  - ImageNet을 포함한 전통적인 모델을 뛰어넘음
+- 2014, seq2seq
+  - text 관련
+- 2014, GAN
+  - 이미지 인식, 생성 기술
+  - 이미지를 생성하고, 이를 평가하는 방식
+- 2015, ResNet
+  - 이미지 인식 기술이 인간의 영역을 뛰어나게 된 시기
+- 2015, 2016, Tensorflow, PyTorch
+  - 누구나 연구, 상용제품에 응용
+- 2016, AlphaGo(DQN)
+- 2016, pix2pix
+  - 이미지 생성 기술
+  - 실사 수준까지
+  - Software 2.0 시대 
+- 2017, Deepfakes
+- 2017, Transformer
+  - 텍스트 생성에 지대한 영향
+  - 사람의 지능 정도로 이해
+  - 길이 제한을 크게 늘림
+  - 병렬 계산이 가능해짐
+  - GPT 기반
+- 2018, BERT
+  - LLM의 시초
+  - fine-tuning을 통해 다양한 언어에 쉽게 적용
+  - 한번 학습을 시키면, 적은 데이터를 가지고 학습 가능
+  - 바닥부터 만들지 않아도 가능
+  - 인간 레벨 그 이상
+- 2019, EfficientNet(NAS/AutoML)
+  - AI가 AI를 만드는 기술
+  - 인간이 만든 모델을 뛰어 넘음
+- 2019, SuperGLUE
+- 2020, T5
+  - SuperGLUE 데이터셋
+    - 정말 어려운 문제
+  - 인간과 근접한 성능을 나타냄
+- 2020, GPT-3(zero-shot)
+  - BERT의 500배에 달하는 모델
+  - 크기 뿐 아니라 성능이 어마어마 함
+  - 한번 학습하는데 n억
+  - sample 몇개만 주면 학습이 가능함
+  - 샘플을 주지 않아도 왠만큼 처리 가능(zero-shot)
+- 2021, DALL-E
+  - 장면을 설명하면 그림을 그려줌
+- 2021, Copilot
+  - 코드 생성
+  - 실질적인 문제 해결에 도움
+- 2021, Midjourney
+- 2022, Stable Diffusion
+  - oss를 이용함
+- 2022, InstructGPT(RLHF)
+  - GPT-3의 개량
+  - 스스로 계속 학습
+  - GPT가 만들어낸 것을 인간이 평가, 이를 가지고 스스로 학습
+- 2022, ChatGPT
+  - InstructGPT 기반
+  - **이제는 AI가 말귀를 알아먹는다**
+  - 사람이 무언가를 시키면 알아 듣는다
