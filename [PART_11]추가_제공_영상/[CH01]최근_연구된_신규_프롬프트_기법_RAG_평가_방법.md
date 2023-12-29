@@ -196,6 +196,68 @@ Silently modify descriptions that include names or hints or references of specif
   - prompt를 개선하는 prompt
 - 쉽게 사용할 수 있는 framework이 나오면 고려해볼만한 방법
 
-### RAG
+### Collaborate AI
+- 강사가 명명한 말
+- 여러 AI가 협력하여 소프트웨어 개발, 토론을 통해 높은 품질의 답변 도출
+- 여러 작은 task를 수행하는 agent가 많이 만들어지고, 이 에이전트가 협업하도록 만드는 **최상위 에이전트**가 만들어지면
+  - 이는 **AGI**가 됨
+
+#### Communicative Agents for Software Development
+- https://arxiv.org/abs/2310.06117
+- ![image](https://github.com/Wshid/prompt_engineering/assets/10006290/af87db81-802f-49ab-85cf-2f358226e3a9)
+- ChatDev Project
+- 인간과 유사한 상태로 각 역할 부여 및 대화를 통해 고도화
+- 설계, 코딩, 테스트, 문서화를 거쳐 소프트웨어를 만듦
+- 테스트 중에 **역할 반전**을 수행
+  - e.g. designer가 programmer가 되고, ...
+- ![image](https://github.com/Wshid/prompt_engineering/assets/10006290/188fc3a4-afa5-448d-957f-df7c1fa9fe51)
+  - 어떤 언어로 개발할지
+- 아직은 복잡한 프로그램은 작성하기 어려움
+
+#### Meta Programming for Multi-Agent Collaborative Framework
+- https://arxiv.org/abs/2308.00352
+- ![image](https://github.com/Wshid/prompt_engineering/assets/10006290/f2be3eb3-14bb-4353-8621-86ae973af4bc)
+- ChatDev와 유사
+- 전체 프로젝트를 한번에 개발 x
+- 중간마다 사람의 피드백을 받아 개발하는 형태
+- 더 디테일한 부분까지 처리 가능
+- 일반적으로 회사에서 운영하는 하나의 프로젝트 팀 단위 레벨
+
+#### Exploring Collaboration Mechanisms for LLM Agents: A Social Psychology View
+- https://arxiv.org/abs/2310.02124
+- ![image](https://github.com/Wshid/prompt_engineering/assets/10006290/d89e1a3a-c8c1-4766-a2c5-e2c6f3ed4395)
+- 다양한 LLM Agent와 협력해서, 문제해결을 할때는
+  - 개별 Agent의 특성보다는 **협력하는 전략**이 중요하다는 연구 결과
+- 소규모 Agent 집단에서는 서로 동조하는 경향이 강해짐
+- 서로가 비슷한 결론에 도달하여 최적의 결과가 나지 않는 문제가 있었음
+- 그에 따라, LLM Agent 집단에 **다양한 협력 전략 도입**을 제안함
+- ![image](https://github.com/Wshid/prompt_engineering/assets/10006290/c97122d7-24d3-42ac-9d0a-4b9fddf42268)
+  - 각각의 사고 패턴이 다른 여러개의 Agent를 만듦
+    - 그림상 1,2,3번의 Agent를 의미
+  - 그 Agent를 다양한 방식으로 섞고, 그 그룹 안에서 논의하게끔 함
+  - 논의 과정 이후, 최종적으로 하나의 결론을 도출함
+  - 이 과정을 여러번 반복해서 답변 성능을 높힘
+- **Agent 수, Dataset와 Round 수**가 성능에 상당한 영향을 미침
+- 스스로 생각을 Reflection 하는 것 보다
+  - 서로 Debate 하는 것이 오류가 적고 최적의 답변이 나왔다고 함
+- 인간의 사회와 유사하다는 시사점이 나옴
+
+#### Reconcile: Round-Table Conference Improves Reasoning via Consensus among Diverse LLMs
+- https://arxiv.org/abs/2309.13007
+- ![image](https://github.com/Wshid/prompt_engineering/assets/10006290/3b1c918a-6642-4592-a68e-dedfc0ca959f)
+- GPT-4, Bard, Claude2 와 같은 **대규모 언어 모델**이 원탁에 둘러 앉아 토론하면
+  - **더 정확한 답변을 얻을 수 있음**
+- 각각의 모델의 장점을 활용하고, 약점을 보완해서
+  - 전체적인 추론 능력을 향상 시키는 방법
+- 앞서 나온 협력과 유사하나
+  - 각기 다른 회사의 LLM의 성향/능력이 다르기 때문에 더 좋은 결과를 도출할 수 있었음
+- 장점
+  - 여러 LLM을 쉽게 연결할 수 있음
+    - 하나의 모델에 여러 값을 주입하는 형태가 아닌
+    - 각 모델이 다른점을 그대로 활용하기 때문
+- 단일 Agent를 사용하거나 **하나의 LLM**으로 다중 Agent를 만들었던 것의 baseline을 7.7%나 초과함
+- **그냥 단순히 API만 호출하여 사용할 수 있는 방법이므로**
+  - **매우 편리하고 유용한 방법**
+- 앞으로 조금 복잡한 것을 하게 되면, 우선적으로 고려해보면 좋은 방법
 
 ### Evaluation
