@@ -260,4 +260,102 @@ Silently modify descriptions that include names or hints or references of specif
   - **매우 편리하고 유용한 방법**
 - 앞으로 조금 복잡한 것을 하게 되면, 우선적으로 고려해보면 좋은 방법
 
-### Evaluation
+### RAG
+- 긴 컨텍스트 모델을 사용하는 것보다
+  - RAG를 잘 활용하는 것이 **비용 최적화** 및 **성능**을 높일 수 있음
+- RAG에서 중요한 것은 **임베딩 모델**의 선택과 **청킹 전략**임
+- 여러가지 임베딩 모델을 **복합적**으로 사용하거나
+  - **키워드** 및 **디비 쿼리**를 통해 복합적으로 정보를 가져오는 **하이브리드 검색**을 잘 사용해야 함
+
+#### Kaggle - LLM Science Exam
+- https://www.kaggle.com/competitions/kaggle-llm-science-exam/discussion/446422
+- Kaggle 우승한 이후, 해당 방법이 공개됨
+  - 참고할 만한 자료
+- RAG에 사용할 데이터를 잘 정제하여 우승한 사례
+- 다른 팀이 모델 개발에 집중할 때
+  - **데이터 클렌징**과 적절한 **청킹 전략**을 실험함
+- 데이터를 많이 모으는 것보다
+  - **질이 높은 소수의 데이터**를 독보적으로 가지는게 더 좋음
+
+#### 청킹 전략
+- 가장 효율적인 청킹은 **문서의 종류**와 **task**에 따라 다르므로,
+  - 다양한 테스트를 통해 처리할 문서와 task에 적합한 청킹 전략을 찾는것이 필요
+  - silver bullet은 없음(은총알)
+- 기반 가이드
+  - **200~300개 정도의 토큰 단위로 청킹**을 하는것이 적당해보임
+    - 물론 그 수는 계속 조절해 가야함
+  - 처음엔 **문장/문단 단위**로 시도하며, 이로 어려울 경우 200~300개 정도 수준으로 청킹 이후 테스트
+- 튜닝 시
+  - 다소 틀려도 괜찮은지, 무조건 틀리면 안되는지에 따라 어떤 방식을 선택할지 기준이 되기도 함
+- **검색에 최적화된 청킹 전략**과 **프롬프트에 넣어줄 생성 최적화된 청킹 전략**은 **다를 수 있음**
+  - 각각 전략을 따로 세우고 **조합**하는 방법 고려 필요
+  - 정보 검색시의 vector search를 높일 수 있는 chunk size와
+  - 결과 생성시 **높은 성능**으로 결과를 생성하기 위해 LLM에 주입해야 될 정보에 chunk size가 다르다는 의미
+- 일반적으로 Vector Search의 chunk size는 **한 문장/한 문단 단위 이상은 좋지 x**
+  - 단, 앞뒤 맥락이 잘리게 됨
+- 그에 따라 **생성을 위한 정보**는 더 큰 윈도우로 가져와서 제공할 필요가 있음
+
+##### 예시
+- ![image](https://github.com/Wshid/prompt_engineering/assets/10006290/53e157c8-215f-4b01-b17b-39cde17b28fe)
+- Vector Search를 위해 chunk는 **빨간색처럼 문장 단위**로 추출하여 chunk 위주 임베딩
+  - 녹색1, 빨간색, 녹색2로 분리
+- 하지만 생성을 할 때는, 이 청크의 앞뒤 몇개를 가져와서
+  - 이를 가지고 rerank | 정보 판단 | 프롬프트 정보 주입 하는 방법 사용
+  - 단, 이경우에도 주입할 컨텍스트 길이가 너무 커질 수 있으므로
+    - 이 길이를 적절하게 유지할 수 있도록 연구 필요
+
+#### Parent Document Retrieval
+- ![image](https://github.com/Wshid/prompt_engineering/assets/10006290/806fadcb-ac4a-45f0-9ddc-31264d5e2a3d)
+- 청킹 전략의 확장
+- Split Parent Chunk 부분처럼 chunk를 큰 단위로 분리
+  - 한 페이지/문단 단위
+- chunk를 다시 `한 페이지 -> 문단 | 문단 -> 문장` 으로 분리
+- 이 **하위 chunk**를 Vector Search할 수 있도록 저장
+- 검색시,
+  - 하위 chunk를 검색
+  - 검색 결과에서 텍스트를 가져올 때는
+    - `하위 chunk + parent chunk`를 프롬프트에 주입
+- 장점
+  - 작은 문장/문단으로 **유사도 검색**이 되므로, **검색 정확도**를 높힐 수 있음
+  - 주입하는 텍스트는 **부모의 텍스트**이므로, 윈도우가 열려 있어 **텍스트 맥락**은 유지할 수 있음
+- chunk를 하위 청크로 나누는 방법을 확장하여
+  - **트리 검색** | **그래프 검색**을 활용하여 더 높은 성능을 꾀할 수 있음
+
+#### Pre-Generative Retrieval
+- 강사가 이름을 붙임
+- **문서의 일부분**에 대한 질문 생성, 해당 질문을 **임베딩**하여 검색
+- 사용자의 요청이 **대부분 질문**으로 들어올 것을 예상하였을 때, 더 큰 성능 발휘
+- 사용자의 질문에 대한 **여러개의 유사 질문**을 생성하고
+  - 해당 질문과 원래 질문의 문서 검색 후 **가장 적합한 문서**를 생성에 사용
+- ![image](https://github.com/Wshid/prompt_engineering/assets/10006290/18a3c311-4768-4535-aa03-0a5016cc1289)
+  - User Query(사용자 질문)
+  - 유사 질문을 여러개 생성
+  - 유사 질문 Vector Search + 원래 질문 Vector Search
+    - 원래 질문을 다양하게 표현한 효과
+    - 같은 문서여도, 다양한 순서로 검색 | 빠진 문서 같이 검색 가능
+    - 빠진 문서 보완하면서, 상위로 랭크가 많이 올라온 문서들이 높은 우선순위를 가질 수 있음
+    - **rerank도 쉽게 처리 가능**
+
+### References
+- Less is More: Why Use Retrieval Instead of Larger Context Windows (https://www.pinecone.io/blog/why-use-retrieval-instead-of-larger-context/)
+- LLM을 사용하여 FAQ 검색 평가 데이터 세트 만들기(일본어)(https://www.aishift.co.jp/techblog/3710)
+- Is ChatGPT Good at Search? Investigating Large Language Models as Re-Ranking Agent (https://arxiv.org/abs/2304.09542)
+- RAG-Fusion: The Next Frontier of Search Technology (https://github.com/Raudaschl/rag-fusion)
+- RAG and Parent Document Retrievers: Making Sense of Complex Contexts with Code (https://medium.com/ai-insights-cobet/rag-and-parent-document-retrievers-making-sense-of-complex-contexts-with-code-5bd5c3474a8a)
+- Google Colab에서 JapaneseEmbeddingEval로 일본어 Embedding 평가 절차(일본어) (https://note.com/npaka/n/nce7b265b7133)
+- Llamalndex의 성능 향상을 위한 기술 가이드(일본어) (https://note.com/npaka/n/n33e28a9e1402)
+- Evaluating the Ideal Chunk Size for a RAG System using Llamandex (https://blog.llamaindex.ai/evaluating-the-ideal-chunk-size-for-a-rag-system-using-llamaindex-6207e5d3fec5)
+- Optimize LLM Enterprise Applications through Embeddings and Chunking Strategy. (https://actalyst.medium.com/optimize-lIm-enterprise-applications-through-embeddings-and-chunking-strategy-1bbdb03bedae)
+
+### 참고 도구
+- Re-rank를 쉽게 적용할 수 있는 Cohere API
+  - https://txt.cohere.com/rerank/
+  - 기존에는 rerank를 하려면 **자체 모델**을 만들거나 **gpt4**등을 사용
+    - 생성 속도가 느리거나 성능 부족
+- 다양한 방식으로 청킹을 할 수 있는 도구
+  - https://neumai-playground.streamlit.app/
+  - 초기 프로토타이핑시 사용 가능
+  - LangChain에 포함된 다양한 text-splitter를 사용하여 텍스트 분리
+    - 여러가지 방법, 여러 개수 문자/토큰으로 잘라서 테스트 가능
+
+### Evaluation  
