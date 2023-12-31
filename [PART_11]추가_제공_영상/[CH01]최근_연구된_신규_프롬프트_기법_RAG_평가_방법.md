@@ -358,4 +358,70 @@ Silently modify descriptions that include names or hints or references of specif
   - LangChain에 포함된 다양한 text-splitter를 사용하여 텍스트 분리
     - 여러가지 방법, 여러 개수 문자/토큰으로 잘라서 테스트 가능
 
-### Evaluation  
+### Evaluation
+- LLM에 대한 평가 방식은 많이 연구되어 왔으나
+  - RAG 결과나, pipeline, app 결과 평가 방식은 방법론이 x
+
+#### Evaluation Criteria
+- Faithfulness (신뢰성)
+- Relevancy (관련성)
+- Correctness (정확성)
+- Guideline (지침)
+
+#### LLM Evaluation
+- 사용자의 요청을 텍스트로 생성, 결과를 내는 LLM 특성
+- **기존의 테스트 방법들이 적절하지 x**
+  - 사람이 정성적으로 테스트해야 하는 경우 존재
+- GPT-4가 인간 수준의 판단력을 가지고 있다고 인정함
+  - GPT-4에게 평가를 시키는 방법이 대세가 되어감
+  - **LLM-as-a-judge**
+
+#### Benchmark set w/ gpt-4
+- ![image](https://github.com/Wshid/prompt_engineering/assets/10006290/74119fa2-3795-4e13-9265-f6e842b28bad)
+  - benchmark set을 위한 질문도 gpt4로 생성
+  - 질문에 대한 답변도 gpt4로 생성
+  - LLM이 생성한 결과도 gpt4로 평가
+- 위 방법에 대한 평가가 부족하긴 하지만,
+  - 유사한 평가를 가진다는 의견이 많아지고 있음
+
+#### RAG Evaluation
+- RAG 평가는 기존의 **자연어 평가**로 충분히 처리 가능
+- 기존 방법인 **ROUGE**나 **BLEU**점수를 사용하여 평가 가능
+- 일반적으로 평가 데이터를 만들 때
+  - 질문에 따른 chunk를 미리 준비할 것이기 때문에
+  - **유사도 판단**으로 평가하는것이 제일 적절함
+- 평가 데이터를 미리 만들지 않은 경우 아래와 같은 일정 수준 이상의 성능 평가
+  - **GPT-4로 질문/답변을 미리 생성하고**
+  - **해당 답변과의 유사도로 평가하는 방법**
+- 평가 만드는 방법 조차도 2주 ~ 1달 정도 걸릴 수 있음
+- LLM을 만드는 과정의 비용
+  - prototype 1md
+  - app에 1mw, 2mw
+  - 평가 2mw, 1mm
+
+##### FLOW
+- ![image](https://github.com/Wshid/prompt_engineering/assets/10006290/893728fb-6956-42f9-b28b-c4a1efa3642d)
+  - 원본 문서에서 GPT-4를 이용해 질문 세트 생성
+  - 질문 세트에 있는 질문을 하나씩 가져오서 원본 문서를 가지고 답변 생성
+- ![image](https://github.com/Wshid/prompt_engineering/assets/10006290/5398c8ed-3eb4-486f-a4da-6d43994a9296)
+  - 질문 세트, 답변 세트를 GPT-4로 이용하여 만든 이후 chunk Test
+  - chunk 방식도 여러가지 방법으로 테스트 진행
+    - chunk를 문장 단위, 200token, 100token 등 다양하게
+  - 질문 세트를 이용하여 chunk 검색
+  - chunk로 가져온 결과 및 GPT-4로 만든 답변의 유사도 확인
+- **chunk를 검색해오는 성능** 및 **답변을 생성해주기 위해 주입하는 chunk**의 품질 동시 평가 가능
+- 물론, 사용자가 입력한 답변 세트를 **수작업**으로 만드는게
+  - 가장 높은 품질의 결과를 얻을 수 있음
+- 단, 처음 시도하거나 답변 세트를 수작업으로 만들기 부담스러울 경우
+  - 일정 수준의 성능을 담보할 수 있음
+
+#### Reference
+- 청크 사이즈 및 Retrieval 방법을 테스트 해 볼 수 있는 Colab 노트
+  - https://colab.research.google.com/drive/1Siufl13rLI-kII1liaNfvf-NniBdwUpS
+- 아래 3개 툴은 유용하긴 하나, 편하게 쓸 수 있는 정도는 아님. 공부를 하거나 다른 방식으로 사용 필요
+  - Ragas - RAG 파이프라인을 쉽게 평가 할 수 있는 프레임워크
+    - https://docs.ragas.io
+  - DeepEval - 다양한 방식으로 LLM 애플리케이션을 평가 할 수 있는 프레임웍
+    - https://docs.confident-ai.com
+  - LLM evaluation harness - LLM 모델 평가를 위한 라이브러리
+    - https://github.com/EleutherAI/lm-evaluation-harness
